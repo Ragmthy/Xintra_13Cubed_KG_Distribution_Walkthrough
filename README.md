@@ -10,7 +10,7 @@ Full innovation credits for this lab goes to [XINTRA's team](https://www.xintra.
 More information about the labs can be found [here](https://www.xintra.org/labs).
 
 ## Repo:
-This time around, I've uploaded the walkthrough as one [singular scroll]() 📜 It can be read entirely here.
+This time around, I've uploaded the walkthrough as one [singular scroll](https://github.com/Ragmthy/Xintra_13Cubed_KG_Distribution_Walkthrough/blob/main/KG%20Distribution%20Mini%20Lab.md) 📜 It can be read entirely here.
 
 ### Extra Resources that helped along the way: 
 1. Exploration of [MemProcFS and its working methods](https://www.youtube.com/watch?v=hjWVUrf7Obk)
