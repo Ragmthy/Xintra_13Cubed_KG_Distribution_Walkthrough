@@ -172,6 +172,8 @@ To check if other tools were used in this same malicious process, the best thing
 
 After moving the two files into the Desktop, and piping the results into a text file of the strings result, let's see what's available. After some attempts at the command, this one proved to be the most promising: the -a flag ensures an ASCII-only search of the entire file and piped into the text file, and the length of the strings had to be a little more substantial, at 5 characters long. 
 
+*A note, on the -a flag: in the Windows System, it will mean making the [search strictly ASCII alone](https://learn.microsoft.com/en-us/sysinternals/downloads/strings#using-strings). That flag, -a, on another OS might mean something else.*
+
 ![image](lab_qn_images/30_strings_on_mdmp.jpg)
 
 With the result open in Notepad++, the toolkit that was claimed to have been used was introduced around the 21.4k-th line or so. 
@@ -193,6 +195,7 @@ To try and see what it is that was created and staged to pull out of the server,
 And that concludes this Mini Lab, and deep diving into MemProcFS. 
 It's really a nice bridge as someone who hasn't delved into Memory Forensics prior, and see it presented as if it were a disk image, and the relevant folders around it. 
 Mass shoutout to 13Cubed (find this brilliant resource's YouTube channel [here](https://www.youtube.com/13cubed)) for putting this together with Xintra. 
+
 
 
 
