@@ -20,7 +20,7 @@ At the location of the MemProcFS.exe, execute the following command on the .vmem
 ![image](lab_qn_images/02_command_and_result.jpg)
 
 The `-forensic` flag tells MemProcFS to use some built-in "find evil" checks. </br>
-The `-license-accept-elastic-license-2.0` flag that is mentioned here, helps makes use of some in-built YARA rules that can help decipher out known evil malware like Cobalt Strike, and ensures checks are done against these rules also. This will be handy in the 2nd part of the lab. 
+The `-license-accept-elastic-license-2.0` flag that is mentioned here, helps make use of some in-built YARA rules that can help decipher out known evil malware like Cobalt Strike, and ensures checks are done against these rules also. This will be handy in the 2nd part of the lab. 
 
 The end result is the mount point appearing in the device as a default 'M:' in the investigating computer. Now that this is set, we can now minimise the command line window, and proceed with figuring out the lab questions. 
 
@@ -48,7 +48,7 @@ To find the IP Address of this device, it's in the same path as the previous val
 
 ![image](lab_qn_images/07_IP_address.jpg)
 
-In this folder, there are various Interfaces, and not all of them are as feature rich, except for one. It's in one of the specific interfaces that an DhcpIPAddress value was found. 
+In this folder, there are various Interfaces, and not all of them are as feature-rich, except for one. It's in one of the specific interfaces that an DHCPIPAddress value was found. 
 
 *For this next question, there is an assumed scenario that the user would've opened this file as an offline .eml file*
 
@@ -80,11 +80,11 @@ Hence, to find the earliest execution time, the best file for that is in `sys/pr
 
 Around the time of compromise, the threat actors utilized a file transfer tool to download a malicious binary. To find the name of this tool, a useful place to go into was the Prefetch area of timeline_all.csv inside `forensic/csv`.
 
-At that timeframe, there is a presence of Curl being used a tool being used around the same presence of the OfficeUPgrade related software. 
+At that timeframe, there is a presence of Curl being used as a tool around the same time in the presence of the OfficeUPgrade software. 
 
-There are other artifacts to look into from here on, and one of them include a malicious binary that executed roughly after one minute of being downloaded. 
+There are other artefacts to look into from here on, and one of them includes a malicious binary that executed roughly after one minute of being downloaded. 
 
-So let's recap: from the connections text file, we've seen presence of OfficeUPGrade.exe, followed by dwagent.exe. It's highly likely that OfficeUPGrade.exe is the malicious file, but let's look into the timelines to see if it is indeed that. 
+So let's recap: from the connections text file, we've seen the presence of OfficeUPGrade.exe, followed by dwagent.exe. OfficeUPgrade.exe is likely the malicious file, but let's look into the timelines to see if it is indeed that. 
 
 After having the same Prefetch filter, locating and selecting the prefetch for OfficeUPGrade.exe, and removing that filter (this still helps us maintain that line selected), we can see a creation event of the OfficeUPgrade.exe (when it first landed into the system).
 
@@ -104,7 +104,7 @@ When looking into the `forensic/findevil` directory, there is visibility of a DL
 
 ![image](lab_qn_images/16_malicious_dll.jpg)
 
-Alongside these so far, there's also presence of a malicious script. What is the script type? There's no clue: but there's a file we can revisit to try and figure out. 
+Alongside these so far, there's also the presence of a malicious script. What is the script type? There's no clue: but there's a file we can revisit to try and figure out. 
 
 When looking into timeline_ntfs.csv inside `forensic/csv`, when looking at roughly the hour from 2024-08-18 16:50:00 to potentially 18:00:00, and only looking at the 'CRE' values for the 'Action' column, there is one potential file present. 
 
@@ -114,7 +114,7 @@ To confirm if this was the script that triggered the malicious OfficeUPGrade.exe
 
 ![image](lab_qn_images/18_1_folder_present.jpg)
 
-And while traversing the path, there is presence of another DLL mentioned here that was used by the TA through reflective DLL injection. 
+And while traversing the path, there is the presence of another DLL mentioned here that was used by the TA through reflective DLL injection. 
 
 ![image](lab_qn_images/19_reflective_dll.jpg)
 
@@ -136,19 +136,19 @@ That is indeed visible, in the netstat-v file.
 
 The malicious process that helped enable this connection is known as rGARTERny.exe, and has a pid of 4544. As for its path, it is true that some of it is visible in the last column of the netstat-v file, and it states the value: \Device\HarddiskVolume3\Windows\Temp ; however, the path interested here, involves the Drive letter in which Windows would be installed in the Server. 
 
-It is possible to find that, in the pid directory from the Mount point. Here, details of every process is arranged by their PID. As the PID figured out is 4544, we can look into that folder. The path, in the style we're keen on, is in the win-cmdline.txt file: 
+It is possible to find that, in the pid directory from the Mount point. Here, details of every process are arranged by their PID. As the PID figured out is 4544, we can look into that folder. The path, in the style we're keen on, is in the win-cmdline.txt file: 
 
 ![image](lab_qn_images/22_path_of_malicious_exe.jpg)
 
-Another thing to find out, is the Parent Process ID that spawned this malicious process. In that same folder, there exists a file, ppid.txt, and that has a value of 648. Pivoting of this, when we look back into the netstat-v file, the parent process name tied to this is services.exe. 
+Another thing to find out is the Parent Process ID that spawned this malicious process. In that same folder, there exists a file, ppid.txt, and that has a value of 648. Pivoting on this, when we look back into the netstat-v file, the parent process name tied to this is services.exe. 
 
 ![image](lab_qn_images/23_parent_pid.jpg)
 
-The lab hints that a persistence mechanism was created to launch the malicious process; as we know the parent process name is services.exe, the next thing to do was to look into the `sys/services` folder, and look into the services.txt file. There, the PID 4544 (that eventually got spawned), we can see that the Display name for the process, was kept as "officeupgradeservice". 
+The lab hints that a persistence mechanism was created to launch the malicious process; as we know, the parent process name is services.exe, the next thing to do was to look into the `sys/services` folder, and look into the services.txt file. There, the PID 4544 (that eventually got spawned), we can see that the Display name for the process was kept as "officeupgradeservice". 
 
 ![image](lab_qn_images/24_process_name.jpg)
 
-As this the 592nd line of the file, we can pivot off, and verify this in the `sys\services\by-id\592` folder. And here, it's consistent results with what has been observed so far. 
+As this is the 592nd line of the file, we can pivot off and verify this in the `sys\services\by-id\592` folder. And here, it's consistent with what has been observed so far. 
 
 ![image](lab_qn_images/25_svc_info.jpg)
 
@@ -170,7 +170,7 @@ To check if other tools were used in this same malicious process, the best thing
 
 ![image](lab_qn_images/29_minidump_directory.jpg)
 
-After moving the two files into the Desktop, and piping the results into a text file of the strings result, let's see what's available. After some attempts at the command, this one proved to be the most promising: the -a flag only ensure ASCII characters were found and piped into the text file, and the length of the strings had to be a little more substantial, at 5 characters long. 
+After moving the two files into the Desktop, and piping the results into a text file of the strings result, let's see what's available. After some attempts at the command, this one proved to be the most promising: the -a flag ensures an ASCII-only search of the entire file and piped into the text file, and the length of the strings had to be a little more substantial, at 5 characters long. 
 
 ![image](lab_qn_images/30_strings_on_mdmp.jpg)
 
@@ -193,6 +193,7 @@ To try and see what it is that was created and staged to pull out of the server,
 And that concludes this Mini Lab, and deep diving into MemProcFS. 
 It's really a nice bridge as someone who hasn't delved into Memory Forensics prior, and see it presented as if it were a disk image, and the relevant folders around it. 
 Mass shoutout to 13Cubed (find this brilliant resource's YouTube channel [here](https://www.youtube.com/13cubed)) for putting this together with Xintra. 
+
 
 
 
